@@ -27,9 +27,9 @@ Follow these steps to get Rules of Survival up and running on your computer
 - In Any window you can use CTRL + F to show current FPS
 
 ## Preview
-![MainMenu](images/MainMenu.png)
-![RuleSelection](images/RuleSelectionScreenshot.png)
-![InGame](images/InGameScreenshot.png)
-![LeaderBoard](images/LeaderBoardScreenshot.png)
-![GameOver](images/GameOverScreenshot.png)
+![MainMenu](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/MainMenu.PNG)
+![RuleSelection](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/RuleSelectionScreenshot.PNG)
+![InGame](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/InGameScreenshot.PNG)
+![LeaderBoard](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/LeaderBoardScreenshot.PNG)
+![GameOver](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/GameOverScreenshot.PNG)
 
