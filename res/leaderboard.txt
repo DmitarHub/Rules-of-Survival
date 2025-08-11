@@ -1,0 +1,1 @@
+Lazar 1000; Milos 500; Sofija 200; Tata 150; Mama 50; Pera 40; Zika 35; Sera 20; Mile 15; Banko 0;
