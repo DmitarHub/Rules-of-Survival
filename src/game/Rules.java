@@ -37,6 +37,7 @@ public enum Rules {
     {
     	try {
     		Utool u = new Utool();
+
     		BufferedImage icon = ImageIO.read(Rules.class.getResourceAsStream("/rules/" + path));
     		return u.scaleImage(icon, RuleSelectionUI.getIconWidth(), RuleSelectionUI.getIconHeight());
     	} catch (IOException e) {

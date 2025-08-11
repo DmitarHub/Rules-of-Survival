@@ -3,12 +3,15 @@ package game;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Image;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+
+import javax.imageio.ImageIO;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import java.util.List;
@@ -26,6 +29,7 @@ import listeners.KeyInputs;
 import player.EntityType;
 import player.Player;
 import tiles.TileManager;
+import tiles.Utool;
 import player.Enemy;
 import player.Entity;
 
@@ -101,6 +105,8 @@ public class Game extends JPanel implements Runnable{
 	private final int speedBuff = 2;
 	private final int numberOfEnemiesIncrease = 2;
 
+	private Image icon;
+
 	public Game()
 	{
 		init();
@@ -111,13 +117,28 @@ public class Game extends JPanel implements Runnable{
 		mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		mainFrame.setLocationRelativeTo(null);
 		mainFrame.setResizable(false);
+		mainFrame.setIconImage(icon);
 		setFocusable(true);
 		mainFrame.setVisible(true);
 		start();
 	}
 
+    public static BufferedImage loadIcon(String path)
+    {
+    	try {
+    		Utool u = new Utool();
+
+    		BufferedImage icon = ImageIO.read(Game.class.getResourceAsStream(path));
+    		return u.scaleImage(icon, RuleSelectionUI.getIconWidth(), RuleSelectionUI.getIconHeight());
+    	} catch (IOException e) {
+    		System.out.println("Greska u citanju fajla");
+    		return null;
+    	}
+    }
+
 	public void init()
 	{
+		icon = loadIcon("/icon.png");
 		setTileManager(new TileManager(this));
 		this.setPreferredSize(new Dimension(width, height));
 		collisionCheck = new CollisionCheck(this);
