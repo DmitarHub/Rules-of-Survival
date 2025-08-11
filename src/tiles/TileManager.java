@@ -1,6 +1,7 @@
 package tiles;
 
 import java.io.InputStream;
+import java.util.Random;
 import java.io.InputStreamReader;
 import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
@@ -14,6 +15,7 @@ public class TileManager {
 	private final int numOfTiles = TileFileName.values().length;
 	private int[][] map;
 	private Game game;
+	private final int numberOfMaps = 4;
 
 	public TileManager(Game game)
 	{
@@ -21,7 +23,10 @@ public class TileManager {
 		setMap(new int[game.getColumnNumber()][game.getRowNumber()]);
 		tiles = new Tile[numOfTiles];
 		loadTiles();
-		loadMap("/mapa1.txt");
+		Random rand = new Random();
+		int map = rand.nextInt(numberOfMaps);
+		map++;
+		loadMap("/maps/mapa" + map + ".txt");
 	}
 
 	private void loadTiles()
