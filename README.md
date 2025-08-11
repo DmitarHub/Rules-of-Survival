@@ -14,10 +14,15 @@ Follow these steps to get Rules of Survival up and running on your computer
 * Java Development Kit 8 or higher
 1. Clone the repository
 - git clone https://github.com/DmitarHub/Rules-of-Survival.git
-2. Compile the source code
+2. Change the directory
+- cd Rules-of-Survival
+3. Make a bin folder
 - mkdir -p bin or (Windows CMD) mkdir bin
+4. Move files from res folder
+- cp -r res/. bin/
+5. Compile  
 - javac -d bin src/**/*.java
-3. Run the game
+6. Run the game
 - java -cp bin main.Main
 
 ## How to use the project
