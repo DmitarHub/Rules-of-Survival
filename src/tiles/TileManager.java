@@ -15,7 +15,7 @@ public class TileManager {
 	private final int numOfTiles = TileFileName.values().length;
 	private int[][] map;
 	private Game game;
-	private final int numberOfMaps = 4;
+	private final int numberOfMaps = 3;
 
 	public TileManager(Game game)
 	{
