@@ -1,15 +1,16 @@
 package player;
 
 import java.awt.Graphics2D;
+import java.awt.Rectangle;
+import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
 import game.Game;
+import layers.ingame.InGameLayer;
+import listeners.Event;
 import listeners.KeyInputs;
 
 public class Player extends Entity{
-
-
-	private KeyInputs keyInputs;
 
 	private boolean freezing;
 	private final int freezeTimer = 420;
@@ -28,6 +29,8 @@ public class Player extends Entity{
 	private final int disarmedDuration = 45;
 	private int disarmedCounter = 0;
 	private boolean disarming;
+	
+	private boolean inputsReversed = false;
 
 	private boolean swordStrike = false;
 	private final int swordStrikeDuration = 15;
@@ -35,11 +38,18 @@ public class Player extends Entity{
 	private final int initialStrike = 3;
 	private final int attackWidth = 40;
 	private final int attackHeight = 40;
+	
+	private boolean playerOne = false;
 
-	public Player(Game game, KeyInputs keyInputs, int x, int y, int speed, EntityType entityType, int healthPoints)
+	private KeyInputs keyInputs;
+	
+	private Rectangle bounds = new Rectangle();
+
+	public Player(InGameLayer game,int x, int y, int speed, EntityType entityType, int healthPoints, boolean whichPlayer, KeyInputs keyinputs)
 	{
 		super(game, x, y, speed, entityType, healthPoints);
-		this.keyInputs = keyInputs;
+		this.keyInputs = keyinputs;
+		this.playerOne = whichPlayer;
 		this.frozenImages = new Images(game, EntityType.FROZEN);
 		this.strikingImages = new Images(game, EntityType.STRIKING);
 	}
@@ -49,84 +59,180 @@ public class Player extends Entity{
 	@Override
 	public void update()
 	{
-		updateInvincible();
-		updateDisarming();
-		updateDisarmed();
-		updateTeleporting();
-		updateFreezingAndFrozen();
-
+		
+		if(invincible) updateInvincible();
+		if(disarming) updateDisarming();
+		if(disarmed && !disarming) updateDisarmed();
+		if(teleporting) updateTeleporting();
+		if(frozen || freezing)updateFreezingAndFrozen();
+		
 		if(!frozen)
 		{
 			updateMovement();
 		}
-
 	}
-
-	public void setup()
+	
+	private void updateMovement()
 	{
-		healthPoints = maxHealthPoints;
-		freezing = false;
-		freezeCounter = 0;
-		frozen = false;
-		teleporting = false;
-		teleportCounter = 0;
-		disarmed = false;
-		disarmedCounter = 0;
-		disarming = false;
-		swordStrike = false;
-		swordStrikeCounter = 0;
-		invincible = true;
-		invincibleCounter = 0;
+		if(!swordStrike)
+		{
+			if(playerOne)
+			{
+				if (keyInputs != null && (keyInputs.isS() ||
+			    		keyInputs.isD() || keyInputs.isA() || keyInputs.isW() || keyInputs.isSpace()))
+			    {
+
+			    	if (keyInputs.isSpace() && !frozen && !disarming )
+			    	{
+			    		swordStrike = true;
+			    		swordStrike();
+			    		return;
+			    	}
+			    	if(inputsReversed)
+			    	{
+				        if (keyInputs.isW()) setDirection(Direction.DOWN);
+				        if (keyInputs.isS()) setDirection(Direction.UP);
+				        if (keyInputs.isD()) setDirection(Direction.LEFT);
+				        if (keyInputs.isA()) setDirection(Direction.RIGHT);
+			    	}
+			    	else
+			    	{
+				        if (keyInputs.isS()) setDirection(Direction.DOWN);
+				        if (keyInputs.isW()) setDirection(Direction.UP);
+				        if (keyInputs.isA()) setDirection(Direction.LEFT);
+				        if (keyInputs.isD()) setDirection(Direction.RIGHT);
+			    	}
+
+			        collisionCheck();
+			        move();
+			        animationCounter();
+			    }
+			}
+			else
+			{
+				if (keyInputs != null && (keyInputs.isDown() ||
+			    		keyInputs.isUp() || keyInputs.isLeft() || keyInputs.isRight() || keyInputs.isEnter()))
+			    {
+
+			    	if (keyInputs.isEnter() && !frozen && !disarming )
+			    	{
+			    		swordStrike = true;
+			    		swordStrike();
+			    		return;
+			    	}
+			    	if(inputsReversed)
+			    	{
+				        if (keyInputs.isUp()) setDirection(Direction.DOWN);
+				        if (keyInputs.isDown()) setDirection(Direction.UP);
+				        if (keyInputs.isRight()) setDirection(Direction.LEFT);
+				        if (keyInputs.isLeft()) setDirection(Direction.RIGHT);
+			    	}
+			    	else
+			    	{
+				        if (keyInputs.isDown()) setDirection(Direction.DOWN);
+				        if (keyInputs.isUp()) setDirection(Direction.UP);
+				        if (keyInputs.isLeft()) setDirection(Direction.LEFT);
+				        if (keyInputs.isRight()) setDirection(Direction.RIGHT);
+			    	}
+
+			        collisionCheck();
+			        move();
+			        animationCounter();
+			    }
+			}
+
+		}
+		else {
+			swordStrike();
+		}
+
 	}
+
+	
+	@Override
+	public void draw(Graphics2D drawing)
+	{
+		if(frozen)
+		{
+			BufferedImage image = frozenImages.getSprite(direction, spriteNumber - 1);
+			drawing.drawImage(image, x, y, null);
+		}
+		else if(swordStrike)
+		{
+			BufferedImage image = strikingImages.getSprite(direction, spriteNumber - 1);
+			int tempX = x;
+			int tempY = y;
+			switch(direction)
+			{
+				case UP: tempY -= gameLayer.getTileSize(); break;
+				case LEFT: tempX -= gameLayer.getTileSize(); break;
+				default: break;
+			}
+			drawing.drawImage(image, tempX, tempY, null);
+		}
+		else
+		{
+			BufferedImage image = images.getSprite(direction, spriteNumber - 1);
+			drawing.drawImage(image, x, y, null);
+		}
+		int startingX = x + (gameLayer.getTileSize() / 2) - ((maxHealthPoints * heartSpacing) / 2);
+		int startingY = y - yMargin;
+		for(int i = 0; i < maxHealthPoints; i++)
+		{
+			if(i < healthPoints)
+			{
+				drawing.drawImage(images.getFullHeart(), startingX + i * heartSpacing, startingY, null);
+			}
+			else {
+				drawing.drawImage(images.getEmptyHeart(), startingX + i * heartSpacing, startingY, null);
+			}
+		}
+		String name = "";
+		if(playerOne) name = "Player1";
+		else name = "Player2";
+		drawing.drawString(name, startingX + gameLayer.getTileSize()/2, startingY - yMargin/2);
+	}
+
 
 	private void updateInvincible()
 	{
-		if(invincible)
+		invincibleCounter++;
+		if(invincibleCounter >= invincibleTimer)
 		{
-			invincibleCounter++;
-			if(invincibleCounter >= invincibleTimer)
-			{
-				invincibleCounter = 0;
-				invincible = false;
-			}
+			invincibleCounter = 0;
+			invincible = false;
 		}
 	}
 
 	private void updateDisarming()
 	{
-	    if (disarming) {
-	        disarmedCounter++;
-	        if (disarmedCounter >= disarmedDuration)
-	        {
-	            disarming = false;
-	            disarmedCounter = 0;
-	        }
-	    }
+        disarmedCounter++;
+        if (disarmedCounter >= disarmedDuration)
+        {
+            disarming = false;
+            disarmedCounter = 0;
+        }
 	}
 
 	private void updateDisarmed()
 	{
-	    if (disarmed && !disarming) {
-	        disarmedCounter++;
-	        if (disarmedCounter >= disarmedTimer)
-	        {
-	            disarming = true;
+        disarmedCounter++;
+        if (disarmedCounter >= disarmedTimer)
+        {
+            disarming = true;
 
-	            disarmedCounter = 0;
-	        }
-	    }
+            disarmedCounter = 0;
+        }
 	}
 
 	private void updateTeleporting()
 	{
-	    if (teleporting) {
-	        teleportCounter++;
-	        if (teleportCounter >= teleportTimer)
-	        {
-	            randomTeleport();
-	            teleportCounter = 0;
-	        }
-	    }
+        teleportCounter++;
+        if (teleportCounter >= teleportTimer)
+        {
+            randomTeleport();
+            teleportCounter = 0;
+        }
 	}
 
 	private void updateFreezingAndFrozen()
@@ -138,7 +244,7 @@ public class Player extends Entity{
 	            frozen = false;
 	            freezeCounter = 0;
 	        }
-	    } else if (freezing) {
+	    } else {
 	        freezeCounter++;
 	        if (freezeCounter >= freezeTimer)
 	        {
@@ -147,36 +253,7 @@ public class Player extends Entity{
 	        }
 	    }
 	}
-
-	private void updateMovement()
-	{
-		if(!swordStrike)
-		{
-			if (keyInputs != null && (keyInputs.isDown() ||
-		    		keyInputs.isUp() || keyInputs.isLeft() || keyInputs.isRight() || keyInputs.isEnter()))
-		    {
-
-		    	if (keyInputs.isEnter() && !frozen && !disarming )
-		    	{
-		    		swordStrike = true;
-		    		swordStrike();
-		    		return;
-		    	}
-		        if (keyInputs.isDown()) setDirection(Direction.DOWN);
-		        if (keyInputs.isUp()) setDirection(Direction.UP);
-		        if (keyInputs.isLeft()) setDirection(Direction.LEFT);
-		        if (keyInputs.isRight()) setDirection(Direction.RIGHT);
-
-		        collisionCheck();
-		        move();
-		        animationCounter();
-		    }
-		}
-		else {
-			swordStrike();
-		}
-
-	}
+	
 
 	public void swordStrike()
 	{
@@ -189,7 +266,7 @@ public class Player extends Entity{
 		{
 			spriteNumber = 2;
 
-			game.checkCollisionEnemy();
+			gameLayer.checkCollisionEnemy(this);
 		}
 		else if(swordStrikeCounter > swordStrikeDuration)
 		{
@@ -198,27 +275,8 @@ public class Player extends Entity{
 		}
 	}
 
-	public void drawFrozen(Graphics2D graphics2D)
-	{
-		BufferedImage image = frozenImages.getSprite(direction, spriteNumber - 1);
-		graphics2D.drawImage(image, x, y, null);
 
-	}
 
-	public void drawStrike(Graphics2D graphics2D)
-	{
-		BufferedImage image = strikingImages.getSprite(direction, spriteNumber - 1);
-		int tempX = x;
-		int tempY = y;
-		switch(direction)
-		{
-			case UP: tempY -= game.getTileSize(); break;
-			case LEFT: tempX -= game.getTileSize(); break;
-			default: break;
-		}
-		graphics2D.drawImage(image, tempX, tempY, null);
-
-	}
 
 	public void setHP(int hp)
 	{
@@ -231,7 +289,7 @@ public class Player extends Entity{
 		healthPoints -= amount;
 		if(healthPoints <= 0)
 		{
-			game.gameOver();
+			gameLayer.playerDead(this);
 		}
 		else {
 			invincible = true;
@@ -245,7 +303,7 @@ public class Player extends Entity{
 
 	public void reverseInputs(boolean reverse)
 	{
-		keyInputs.reverse(reverse);
+		inputsReversed = reverse;
 	}
 
 	public void setRandomTeleport(boolean teleport)
@@ -256,18 +314,18 @@ public class Player extends Entity{
 
 	public void randomTeleport()
 	{
-		this.x = game.getRandom().nextInt(game.getRowNumber());
-		this.y = game.getRandom().nextInt(game.getColumnNumber());
+		this.x = gameLayer.getRandom().nextInt(gameLayer.getRowNumber());
+		this.y = gameLayer.getRandom().nextInt(gameLayer.getColumnNumber());
 
-		while(game.getCollisionMap()[y][x])
+		while(gameLayer.getCollisionMap()[y][x])
 		{
-			x = game.getRandom().nextInt(game.getRowNumber());
-			y = game.getRandom().nextInt(game.getColumnNumber());
+			x = gameLayer.getRandom().nextInt(gameLayer.getRowNumber());
+			y = gameLayer.getRandom().nextInt(gameLayer.getColumnNumber());
 
 		}
 
-		x *= game.getTileSize();
-		y *= game.getTileSize();
+		x *= gameLayer.getTileSize();
+		y *= gameLayer.getTileSize();
 	}
 
 	public void setFreeze(boolean freeze)
@@ -313,8 +371,9 @@ public class Player extends Entity{
 		return attackWidth;
 	}
 
-	public KeyInputs getKeyInputs()
+	public Rectangle getBounds()
 	{
-		return keyInputs;
+		bounds.setBounds(x + hitbox.getOffsetX(), y + hitbox.getOffsetY(), hitbox.getHitboxWidth(), hitbox.getHitboxHeight());
+		return bounds;
 	}
 }

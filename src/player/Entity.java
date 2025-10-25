@@ -4,7 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import game.Game;
-import game.HitBox;
+import layers.ingame.InGameLayer;
 
 public class Entity {
 
@@ -20,7 +20,7 @@ public class Entity {
 	protected int x, y;
 	protected int speed;
 	protected boolean collisionOn = false;
-	protected Game game;
+	protected InGameLayer gameLayer;
 	protected int startingX;
 	protected int startingY;
 	protected final int heartSpacing = 18;
@@ -29,11 +29,12 @@ public class Entity {
 	protected boolean invincible;
 	protected int invincibleCounter = 0;
 	protected final int invincibleTimer = 45;
+	protected final EntityType type;
 
-	public Entity(Game game, int x, int y, int speed, EntityType entityType, int healthPoints)
+	public Entity(InGameLayer game, int x, int y, int speed, EntityType entityType, int healthPoints)
 	{
 		this.id = ++staticId;
-		this.game = game;
+		this.gameLayer = game;
 		this.x = x;
 		this.y = y;
 		this.speed = speed;
@@ -48,11 +49,18 @@ public class Entity {
 		case ENEMY:
 			hitbox = new HitBox(EntityType.ENEMY);
 			break;
+		case PIRATE:
+			hitbox = new HitBox(EntityType.PIRATE);
+			break;
+		case PLANTTHING:
+			hitbox = new HitBox(EntityType.PLANTTHING);
+			break;
 		case FROZEN:
 			break;
 		case STRIKING:
 			break;
 		}
+		this.type = entityType;
 		direction = Direction.DOWN;
 
 	}
@@ -70,12 +78,7 @@ public class Entity {
 	{
 		BufferedImage image = images.getSprite(direction, spriteNumber - 1);
 		graphics2D.drawImage(image, x, y, null);
-
-	}
-
-	public void drawHP(Graphics2D graphics2D)
-	{
-		int startingX = x + (game.getTileSize() / 2) - ((maxHealthPoints * heartSpacing) / 2);
+		int startingX = x + (gameLayer.getTileSize() / 2) - ((maxHealthPoints * heartSpacing) / 2);
 		int startingY = y - yMargin;
 		for(int i = 0; i < maxHealthPoints; i++)
 		{
@@ -89,11 +92,12 @@ public class Entity {
 		}
 	}
 
+
 	public void collisionCheck()
 	{
 		setCollisionOn(false);
 
-		game.getCollisionCheck().checkTile(this);
+		gameLayer.getCollisionCheck().checkTile(this);
 
 	}
 

@@ -8,19 +8,21 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
 import game.Game;
+import layers.BottomLayer;
+import layers.ingame.InGameLayer;
 
 public class TileManager {
 
 	private Tile[] tiles;
 	private final int numOfTiles = TileFileName.values().length;
 	private int[][] map;
-	private Game game;
+	private InGameLayer gameLayer;
 	private final int numberOfMaps = 3;
 
-	public TileManager(Game game)
+	public TileManager(InGameLayer game)
 	{
-		this.game = game;
-		setMap(new int[game.getColumnNumber()][game.getRowNumber()]);
+		this.gameLayer = game;
+		setMap(new int[gameLayer.getColumnNumber()][gameLayer.getRowNumber()]);
 		tiles = new Tile[numOfTiles];
 		loadTiles();
 		Random rand = new Random();
@@ -28,10 +30,11 @@ public class TileManager {
 		map++;
 		loadMap("/maps/mapa" + map + ".txt");
 	}
+	
 
 	private void loadTiles()
 	{
-		Utool u = new Utool();
+		ScaleTool u = new ScaleTool();
         try {
             TileFileName[] names = TileFileName.values();
             for (int i = 0; i < names.length; i++) {
@@ -40,7 +43,7 @@ public class TileManager {
                 BufferedImage original = ImageIO.read(getClass().getResourceAsStream(filename));
 
                 tiles[i].setImage(original);
-                tiles[i].setImage(u.scaleImage(original, game.getTileSize(), game.getTileSize()));
+                tiles[i].setImage(u.scaleImage(original, gameLayer.getTileSize(), gameLayer.getTileSize()));
                 tiles[i].setName(names[i].name());
                 if(names[i].name().contains("Water") || names[i].name().contains("Tree") ||
                    names[i].name().contains("Bush")) tiles[i].setCollision(true);
@@ -59,11 +62,11 @@ public class TileManager {
 			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 
 
-			for(int i = 0; i < game.getColumnNumber(); i++)
+			for(int i = 0; i < gameLayer.getColumnNumber(); i++)
 			{
 				String line = bufferedReader.readLine();
 				String row[] = line.split(" ");
-				for(int j = 0; j < game.getRowNumber(); j++)
+				for(int j = 0; j < gameLayer.getRowNumber(); j++)
 				{
 					int num = Integer.parseInt(row[j]);
 
@@ -81,10 +84,10 @@ public class TileManager {
 	public void draw(Graphics2D g)
 	{
 		int col = 0, row = 0;
-		while(row < game.getRowNumber())
+		while(row < gameLayer.getRowNumber())
 		{
-			int screenX = game.getTileSize() * col;
-			int screenY = game.getTileSize() * row;
+			int screenX = gameLayer.getTileSize() * col;
+			int screenY = gameLayer.getTileSize() * row;
 			int tileNumber = getMap()[row][col];
 
 			if (tileNumber >= 0 && tileNumber < tiles.length && tiles[tileNumber] != null) {
@@ -93,7 +96,7 @@ public class TileManager {
 
 
 			col++;
-			if(col == game.getColumnNumber())
+			if(col == gameLayer.getColumnNumber())
 			{
 				col = 0;
 				row++;

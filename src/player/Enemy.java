@@ -4,77 +4,32 @@ import java.util.List;
 import java.util.Random;
 
 import game.Game;
-import tiles.PathFinder;
+import layers.ingame.InGameLayer;
 
 public class Enemy extends Entity{
 
-	private Player player;
-	private boolean chasingPlayer = false;
-	private PathFinder pathFinder;
+	protected List<Player> players;
 
-	private final int randomMoveDelay = 60;
-	private int randomMoveCounter = 0;
+	protected boolean spawning;
+	protected final int spawnDuration = 60;
+	protected int spawnCounter = 0;
 
-	private boolean spawning;
-	private final int spawnDuration = 60;
-	private int spawnCounter = 0;
+	protected int analyticsId;
+	protected boolean dead = false;
 
-	private boolean dead = false;
-
-	public Enemy(Game game, int x, int y, int speed, EntityType entityType, int healthPoints, Player player)
+	public Enemy(InGameLayer game, int x, int y, int speed, EntityType entityType, int healthPoints, List<Player> players)
 	{
 		super(game, x, y, speed, entityType, healthPoints);
-		this.player = player;
-		this.pathFinder = new PathFinder(this.game);
+		this.players = players;
 		this.spawning = true;
 	}
-
 
 	@Override
 	public void update()
 	{
-
-		updateSpawning();
-		updateInvincible();
-		if(chasingPlayer)
-		{
-			int currentRow = y / game.getTileSize();
-	        int currentCol = x / game.getTileSize();
-
-	        int playerRow = player.getY() / game.getTileSize();
-	        int playerCol = player.getX() / game.getTileSize();
-
-	        List<int[]> path = pathFinder.findPath(currentRow, currentCol, playerRow, playerCol);
-
-	        if (path.size() > 1) {
-	            int[] nextStep = path.get(path.size() - 2);
-
-	            int nextRow = nextStep[0];
-	            int nextCol = nextStep[1];
-
-	            if (nextRow < currentRow) setDirection(Direction.UP);
-	            else if (nextRow > currentRow) setDirection(Direction.DOWN);
-	            else if (nextCol < currentCol) setDirection(Direction.LEFT);
-	            else if (nextCol > currentCol) setDirection(Direction.RIGHT);
-
-	            collisionCheck();
-
-	            move();
-	        } else {
-	        	chasingPlayer = false;
-	        }
-		}
-		else {
-			randomMove();
-			double distanceToPlayer = getDistanceToPlayer();
-			if(distanceToPlayer <= game.getTileSize() * 2) chasingPlayer = true;
-
-		}
-
-		animationCounter();
+		
 	}
-
-	private void updateSpawning()
+	protected void updateSpawning()
 	{
 		if(spawning)
 		{
@@ -93,7 +48,7 @@ public class Enemy extends Entity{
 		return spawning;
 	}
 
-	private void updateInvincible()
+	protected void updateInvincible()
 	{
 		if(invincible)
 		{
@@ -106,35 +61,13 @@ public class Enemy extends Entity{
 		}
 	}
 
-	private double getDistanceToPlayer()
+	protected double getDistanceToPlayer(Player p)
 	{
-		int dx = player.getX() - x;
-		int dy = player.getY() - y;
+		int dx = p.getX() - x;
+		int dy = p.getY() - y;
 		return Math.sqrt(dx * dx + dy * dy);
 	}
 
-
-	private void randomMove()
-	{
-		if(randomMoveCounter <= 0)
-		{
-			pickRandomDirection();
-			randomMoveCounter = randomMoveDelay;
-		}
-		else {
-			randomMoveCounter--;
-		}
-
-		collisionCheck();
-
-		move();
-
-		if(isCollisionOn())
-		{
-			pickRandomDirection();
-			randomMoveCounter = randomMoveDelay;
-		}
-	}
 
 	public void takeDamage(int amount)
 	{
@@ -142,9 +75,11 @@ public class Enemy extends Entity{
 		healthPoints -= amount;
 		if(healthPoints <= 0)
 		{
+			gameLayer.getAnalytics().registerDeath(analyticsId);
 			this.setDead(true);
 		}
 		else {
+			gameLayer.getAnalytics().registerDamageTaken(analyticsId, amount);
 			invincible = true;
 		}
 	}
@@ -159,76 +94,17 @@ public class Enemy extends Entity{
 		return dead;
 	}
 
-	private void pickRandomDirection()
-	{
-		int i = new Random().nextInt(4);
-		switch(i)
-		{
-		case 0 -> setDirection(Direction.UP);
-		case 1 -> setDirection(Direction.DOWN);
-		case 2 -> setDirection(Direction.LEFT);
-		case 3 -> setDirection(Direction.RIGHT);
-		}
+	public List<Player> getPlayers() { return players; }
+
+	public EntityType getType() {
+		// TODO Auto-generated method stub
+		return type;
 	}
 
-
-	public void reverseDirection() {
-		switch(direction)
-		{
-		case UP:
-			direction = Direction.DOWN;
-			break;
-		case DOWN:
-			direction = Direction.UP;
-			break;
-		case RIGHT:
-			direction = Direction.LEFT;
-			break;
-		case LEFT:
-			direction = Direction.RIGHT;
-			break;
-
-		}
+	public void setAnalyticsId(int id) {
+		// TODO Auto-generated method stub
+		analyticsId = id;
 	}
-
-
-	public void handleEnemeyCollision(Entity e2) {
-
-	    double overlapX = (x - e2.getX());
-	    double overlapY = (y - e2.getY());
-
-	    if (Math.abs(overlapX) > Math.abs(overlapY)) {
-	        if (overlapX > 0) {
-	            x += 2;
-	            e2.setX(e2.getX() - 2);
-	        } else {
-	            x -=2;
-	            e2.setX(e2.getX() + 2);
-	        }
-	    } else {
-	        if (overlapY > 0) {
-	            y += 2;
-	            e2.setY(e2.getY() - 2);
-	        } else {
-	            y -= 2;
-	            e2.setY(e2.getY() + 2);
-	        }
-	    }
-
-
-	    this.changeToRandomDirection();
-	    ((Enemy)e2).changeToRandomDirection();
-	}
-
-	public void changeToRandomDirection() {
-	    Direction old = this.direction;
-	    Direction[] values = Direction.values();
-	    Direction newDir;
-	    do {
-	        newDir = values[(int)(Math.random() * values.length)];
-	    } while (newDir == old);
-
-	    this.direction = newDir;
-	}
-
+	
+	public int getAnalyticsId() { return analyticsId; }
 }
