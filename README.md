@@ -3,10 +3,14 @@ Rules of Survival is a Java-based survival game where you try to survive as many
 ## Project Features
 * WASD Controls
 * NPC interaction
-* FPS toggle
+* FPS/Stats toggle
 * 5 Rounds with 4 Waves each 
 * Collision detection
 * Tiled maps
+* Two players
+* Layered system
+* Pause with Esc
+* Mouse controls
 
 ## Instalation Guide
 Follow these steps to get Rules of Survival up and running on your computer
@@ -26,13 +30,15 @@ Follow these steps to get Rules of Survival up and running on your computer
 - java -cp bin main.Main
 
 ## How to use the project
-- In the Main menu W and S control the movement, while ENTER selects the hovered option
-- In the Game WASD moves your character, ENTER is an attack command
+- In the Main menu using your mouse choose the option you want
+- Check the controls tab for control information
 - In the Game over screen you first need to enter a name ( max 12 characters ) and press enter to be able to move on
-- In Any window you can use CTRL + F to show current FPS
+- In Any window you can use CTRL + F to show current FPS and Mouse information
 
 ## Preview
 ![MainMenu](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/MainMenu.PNG)
+![Controls](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/Controls.PNG)
+![Pause](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/Pause.PNG)
 ![RuleSelection](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/RuleSelectionScreenshot.PNG)
 ![InGame](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/InGameScreenshot.PNG)
 ![LeaderBoard](https://github.com/DmitarHub/Rules-of-Survival/raw/main/images/LeaderBoardScreenshot.PNG)
