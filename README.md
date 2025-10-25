@@ -24,10 +24,14 @@ Follow these steps to get Rules of Survival up and running on your computer
 - mkdir -p bin or (Windows CMD) mkdir bin
 4. Move files from res folder
 - cp -r res/. bin/
-5. Compile  
-- javac -d bin src/**/*.java
-6. Run the game
-- java -cp bin main.Main
+5. Change to source folder
+- cd src
+- dir /s /b *.java > sources.txt
+6. Compile  
+- javac -d ..\bin @sources.txt
+7. Run the game
+- cd ..
+- java -cp bin game.Main
 
 ## How to use the project
 - In the Main menu using your mouse choose the option you want
