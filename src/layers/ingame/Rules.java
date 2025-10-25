@@ -10,12 +10,12 @@ import tiles.ScaleTool;
 public enum Rules {
     SLOWED("SLOWED", "Your speed is decreased for this round!", loadIcon("SLOWED.PNG")),
     FREEZE("FREEZE", "You get frozen for 1 second every 7 seconds!", loadIcon("FREEZE.PNG")),
-    //ONE_HP("ONE HP", "You are one hit from death!", loadIcon("ONE_HP.PNG")),
-    //REVERSED_INPUTS("REVERSED INPUTS", "Your keybindings are reversed!", loadIcon("REVERSED_INPUTS.PNG")),
-    //FASTER_ENEMIES("FASTER ENEMIES", "Enemies are faster this round!", loadIcon("FASTER_ENEMIES.PNG")),
+    ONE_HP("ONE HP", "You are one hit from death!", loadIcon("ONE_HP.PNG")),
+    REVERSED_INPUTS("REVERSED INPUTS", "Your keybindings are reversed!", loadIcon("REVERSED_INPUTS.PNG")),
+    FASTER_ENEMIES("FASTER ENEMIES", "Enemies are faster this round!", loadIcon("FASTER_ENEMIES.PNG")),
     DISARMED("DISARMED", "You can't attack for 0.45 seconds every 4 seconds!", loadIcon("DISARMED.PNG")),
     WEAKENED_DEFENSE("WEAKENED DEFENSE", "You take 50% more damage this round!", loadIcon("WEAKENED_DEFENSE.PNG")),
-    //RANDOM_TELEPORT("RANDOM TELEPORT", "You randomly teleport a short distance every 5 seconds!", loadIcon("RANDOM_TELEPORT.PNG")),
+    RANDOM_TELEPORT("RANDOM TELEPORT", "You randomly teleport a short distance every 5 seconds!", loadIcon("RANDOM_TELEPORT.PNG")),
     INCREASED_ENEMIES("INCREASED ENEMIES", "This round more enemies will spawn!", loadIcon("INCREASED_ENEMIES.PNG"));
 
 	private final String name;

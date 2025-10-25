@@ -445,24 +445,24 @@ public class InGameLayer extends BottomLayer {
 			case FREEZE:
 				for(Player player : players) player.setFreeze(false);
 				break;
-			//case ONE_HP:
-				//for(Player player : players) player.setHP(playerMaxHealthPoints);
-				//break;
-			//case REVERSED_INPUTS:
-				//for(Player player : players) player.reverseInputs(false);
-				//break;
-//			case FASTER_ENEMIES:
-//				monsterSpeed -= speedBuff;
-//				break;
+			case ONE_HP:
+				for(Player player : players) player.setHP(playerMaxHealthPoints);
+				break;
+			case REVERSED_INPUTS:
+				for(Player player : players) player.reverseInputs(false);
+				break;
+			case FASTER_ENEMIES:
+				monsterSpeed -= speedBuff;
+				break;
 			case DISARMED:
 				for(Player player : players) player.setDisarmed(false);
 				break;
 			case WEAKENED_DEFENSE:
 				monsterAttack -= 1;
 				break;
-			//case RANDOM_TELEPORT:
-				//for(Player player : players) player.setRandomTeleport(false);
-				//break;
+			case RANDOM_TELEPORT:
+				for(Player player : players) player.setRandomTeleport(false);
+				break;
 			case INCREASED_ENEMIES:
 				increaseEnemies(-numberOfEnemiesIncrease);
 				break;
@@ -599,24 +599,24 @@ public class InGameLayer extends BottomLayer {
 		case FREEZE:
 			for(Player player : players) player.setFreeze(true);
 			break;
-		//case ONE_HP:
-			//for(Player player : players) player.setHP(1);
-			//break;
-		//case REVERSED_INPUTS:
-			//for(Player player : players) player.reverseInputs(true);
-			//break;
-//		case FASTER_ENEMIES:
-//			monsterSpeed += speedBuff;
-//			break;
+		case ONE_HP:
+			for(Player player : players) player.setHP(1);
+			break;
+		case REVERSED_INPUTS:
+			for(Player player : players) player.reverseInputs(true);
+			break;
+		case FASTER_ENEMIES:
+			monsterSpeed += speedBuff;
+			break;
 		case DISARMED:
 			for(Player player : players) player.setDisarmed(true);
 			break;
 		case WEAKENED_DEFENSE:
 			monsterAttack += 1;
 			break;
-		//case RANDOM_TELEPORT:
-			//for(Player player : players) player.setRandomTeleport(true);
-			//break;
+		case RANDOM_TELEPORT:
+			for(Player player : players) player.setRandomTeleport(true);
+			break;
 		case INCREASED_ENEMIES:
 			increaseEnemies(numberOfEnemiesIncrease);
 			break;
