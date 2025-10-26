@@ -1,6 +1,6 @@
 package layers.ingame;
 
-import player.Entity;
+import entity.AliveEntity;
 
 public class CollisionCheck {
 
@@ -11,7 +11,7 @@ public class CollisionCheck {
 		this.gameLayer = game;
 	}
 
-	public void checkTile(Entity entity)
+	public void checkTile(AliveEntity entity)
 	{
 		int left = entity.getX() + entity.getHitbox().getOffsetX();
 		int right = entity.getX() + entity.getHitbox().getOffsetX() + entity.getHitbox().getHitboxWidth();

@@ -1,4 +1,4 @@
-package player;
+package entity;
 
 public class HitBox {
 
@@ -39,6 +39,18 @@ public class HitBox {
 		case FROZEN:
 			break;
 		case STRIKING:
+			break;
+		case COIN:
+			offsetX = 0;
+			offsetY = 0;
+			hitboxWidth = 36;
+			hitboxHeight = 36;
+			break;
+		case HEART:
+			offsetX = 0;
+			offsetY = 0;
+			hitboxWidth = 36;
+			hitboxHeight = 36;
 			break;
 		}
 	}

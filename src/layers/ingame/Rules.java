@@ -16,7 +16,8 @@ public enum Rules {
     DISARMED("DISARMED", "You can't attack for 0.45 seconds every 4 seconds!", loadIcon("DISARMED.PNG")),
     WEAKENED_DEFENSE("WEAKENED DEFENSE", "You take 50% more damage this round!", loadIcon("WEAKENED_DEFENSE.PNG")),
     RANDOM_TELEPORT("RANDOM TELEPORT", "You randomly teleport a short distance every 5 seconds!", loadIcon("RANDOM_TELEPORT.PNG")),
-    INCREASED_ENEMIES("INCREASED ENEMIES", "This round more enemies will spawn!", loadIcon("INCREASED_ENEMIES.PNG"));
+    INCREASED_ENEMIES("INCREASED ENEMIES", "This round more enemies will spawn!", loadIcon("INCREASED_ENEMIES.PNG")),
+	BIGGER_CIRCLE("BIGGER CIRCLE", "Plant Thing's slow range is bigger!", loadIcon("BIGGER_CIRCLE.PNG"));
 
 	private final String name;
 	private final String description;

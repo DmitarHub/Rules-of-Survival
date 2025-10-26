@@ -1,4 +1,4 @@
-package player;
+package entity;
 
 public enum EntityType {
 	PLAYER,
@@ -6,5 +6,7 @@ public enum EntityType {
 	PIRATE,
 	PLANTTHING,
 	FROZEN,
-	STRIKING
+	STRIKING,
+	COIN,
+	HEART
 }

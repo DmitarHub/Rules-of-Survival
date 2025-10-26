@@ -1,12 +1,13 @@
-package player;
+package entity;
 
 import java.util.List;
 import java.util.Random;
 
+import entity.collectable.Collectable;
 import game.Game;
 import layers.ingame.InGameLayer;
 
-public class Enemy extends Entity{
+public class Enemy extends AliveEntity{
 
 	protected List<Player> players;
 
@@ -16,6 +17,8 @@ public class Enemy extends Entity{
 
 	protected int analyticsId;
 	protected boolean dead = false;
+	
+	protected Random random = new Random();
 
 	public Enemy(InGameLayer game, int x, int y, int speed, EntityType entityType, int healthPoints, List<Player> players)
 	{
@@ -76,6 +79,13 @@ public class Enemy extends Entity{
 		if(healthPoints <= 0)
 		{
 			gameLayer.getAnalytics().registerDeath(analyticsId);
+			int chance = random.nextInt(100);
+			if(chance >= 50)
+			{
+				Collectable c = new Collectable(x, y, EntityType.COIN);
+				gameLayer.getCollectables().add(c);
+				gameLayer.getAllEntities().add(c);
+			}
 			this.setDead(true);
 		}
 		else {
@@ -84,27 +94,10 @@ public class Enemy extends Entity{
 		}
 	}
 
-	public void setDead(boolean dead)
-	{
-		this.dead = dead;
-	}
-
-	public boolean isDead()
-	{
-		return dead;
-	}
-
+	public void setDead(boolean dead) { this.dead = dead; }
+	public boolean isDead() { return dead; }
 	public List<Player> getPlayers() { return players; }
-
-	public EntityType getType() {
-		// TODO Auto-generated method stub
-		return type;
-	}
-
-	public void setAnalyticsId(int id) {
-		// TODO Auto-generated method stub
-		analyticsId = id;
-	}
-	
+	public EntityType getType() { return type; }
+	public void setAnalyticsId(int id) { analyticsId = id; }
 	public int getAnalyticsId() { return analyticsId; }
 }

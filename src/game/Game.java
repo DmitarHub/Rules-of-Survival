@@ -5,6 +5,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import listeners.MouseInfo;
+
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.util.List;
@@ -51,6 +52,7 @@ public class Game extends JPanel implements Runnable{
 	private boolean awaitingTransition = false;
 	private Class<? extends Layer> layerClass;
 	private MouseInfo mi = new MouseInfo(this);
+	
 	
 	private int numberOfPlayers = 1;
 	
@@ -161,7 +163,11 @@ public class Game extends JPanel implements Runnable{
 			System.exit(1);
 		}
 	}
+	
 
+
+	
+	
 	public void update()
     {
 		if(awaitingTransition)

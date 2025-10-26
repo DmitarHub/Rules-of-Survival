@@ -1,4 +1,4 @@
-package player;
+package entity;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
@@ -17,16 +17,18 @@ public class CircleEffect {
     private double speed = 0.5; 
 	private InGameLayer gameLayer;
 	
-	public CircleEffect(InGameLayer gameLayer, int x, int y)
+	
+	public CircleEffect(InGameLayer gameLayer, int x, int y, double maxRadiusScale)
 	{
 		this.gameLayer = gameLayer;
 		double tileSize = gameLayer.getTileSize();
-		area = new Ellipse2D.Double(x, y, tileSize * 1.5, tileSize * 1.5);
+        maxRadius = tileSize * maxRadiusScale;
+		area = new Ellipse2D.Double(x, y, maxRadius, maxRadius);
 		gameLayer.getCircleEffects().add(this);
 		
         centerX = x + tileSize / 2.0;
         centerY = y + tileSize / 2.0;
-        maxRadius = tileSize * 2.5;
+
 	}
 	
     public void update() {

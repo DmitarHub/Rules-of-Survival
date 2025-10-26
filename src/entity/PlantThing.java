@@ -1,4 +1,4 @@
-package player;
+package entity;
 
 import java.util.List;
 
@@ -8,10 +8,13 @@ public class PlantThing extends Enemy {
 
 	private CircleEffect slowEffect;
 	
+	private double circleSize;
+	
 	public PlantThing(InGameLayer game, int x, int y, EntityType entityType, int healthPoints,
-			List<Player> players) {
+			List<Player> players, double circleSize) {
 		super(game, x, y, 0, entityType, healthPoints, players);
-		slowEffect = new CircleEffect(game, x, y);
+		this.circleSize = circleSize;
+		slowEffect = new CircleEffect(game, x, y, circleSize);
 	}
 
 	@Override
@@ -35,6 +38,8 @@ public class PlantThing extends Enemy {
 			invincible = true;
 		}
 	}
-
+	
+	public void setCircleSize(double newSize) { circleSize = newSize; }
+	public double getCircleSize() { return circleSize; }
 
 }

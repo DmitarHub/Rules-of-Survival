@@ -1,16 +1,17 @@
-package player;
+package entity;
 
 import java.awt.Graphics2D;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 
+import entity.collectable.Collectable;
 import game.Game;
 import layers.ingame.InGameLayer;
 import listeners.Event;
 import listeners.KeyInputs;
 
-public class Player extends Entity{
+public class Player extends AliveEntity{
 
 	private boolean freezing;
 	private final int freezeTimer = 420;
@@ -42,14 +43,18 @@ public class Player extends Entity{
 	private boolean playerOne = false;
 
 	private KeyInputs keyInputs;
-	
+	private final String name;
 	private Rectangle bounds = new Rectangle();
+	
+	private int coins = 0;
 
 	public Player(InGameLayer game,int x, int y, int speed, EntityType entityType, int healthPoints, boolean whichPlayer, KeyInputs keyinputs)
 	{
 		super(game, x, y, speed, entityType, healthPoints);
 		this.keyInputs = keyinputs;
 		this.playerOne = whichPlayer;
+		if(playerOne) name = "Player1";
+		else name = "Player2";
 		this.frozenImages = new Images(game, EntityType.FROZEN);
 		this.strikingImages = new Images(game, EntityType.STRIKING);
 	}
@@ -187,9 +192,6 @@ public class Player extends Entity{
 				drawing.drawImage(images.getEmptyHeart(), startingX + i * heartSpacing, startingY, null);
 			}
 		}
-		String name = "";
-		if(playerOne) name = "Player1";
-		else name = "Player2";
 		drawing.drawString(name, startingX + gameLayer.getTileSize()/2, startingY - yMargin/2);
 	}
 
@@ -275,7 +277,20 @@ public class Player extends Entity{
 		}
 	}
 
-
+	public void collect(Collectable c)
+	{
+		switch(c.getType())
+		{
+		case COIN:
+			coins += 1;
+			break;
+		case HEART:
+			healthPoints = ( healthPoints + 1 ) % maxHealthPoints;
+			break;
+		default:
+			break;
+		}
+	}
 
 
 	public void setHP(int hp)
@@ -376,4 +391,5 @@ public class Player extends Entity{
 		bounds.setBounds(x + hitbox.getOffsetX(), y + hitbox.getOffsetY(), hitbox.getHitboxWidth(), hitbox.getHitboxHeight());
 		return bounds;
 	}
+	
 }

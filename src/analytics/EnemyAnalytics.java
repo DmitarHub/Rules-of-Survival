@@ -6,8 +6,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import player.Enemy;
-import player.EntityType;
+import entity.Enemy;
+import entity.EntityType;
 
 public class EnemyAnalytics {
     private final Map<Integer, EnemyStats> statsById = new HashMap<>();

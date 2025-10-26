@@ -3,7 +3,7 @@ package analytics;
 import java.util.ArrayList;
 import java.util.List;
 
-import player.EntityType;
+import entity.EntityType;
 
 public class EnemyStats {
 	public final int id;

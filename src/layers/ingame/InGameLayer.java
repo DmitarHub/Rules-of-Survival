@@ -17,21 +17,23 @@ import java.util.List;
 import java.util.Random;
 
 import analytics.EnemyAnalytics;
+import entity.AliveEntity;
+import entity.CircleEffect;
+import entity.Enemy;
+import entity.Entity;
+import entity.EntityType;
+import entity.Monster;
+import entity.Pirate;
+import entity.PlantThing;
+import entity.Player;
+import entity.RocketMarker;
+import entity.collectable.Collectable;
 import game.Game;
 import layers.BottomLayer;
 import layers.Layer;
 import layers.gameover.GameOverLayer;
 import listeners.DifferentEvents;
 import listeners.Event;
-import player.Monster;
-import player.CircleEffect;
-import player.Enemy;
-import player.Entity;
-import player.EntityType;
-import player.Player;
-import player.RocketMarker;
-import player.Pirate;
-import player.PlantThing;
 import tiles.TileManager;
 
 public class InGameLayer extends BottomLayer {
@@ -108,6 +110,8 @@ public class InGameLayer extends BottomLayer {
 	private final int speedDeBuff = 2;
 	private final int speedBuff = 2;
 	private final int numberOfEnemiesIncrease = 2;
+	private final double extraCircleSize = 1.0;
+	private double circleSize = 2.5;
 	
 	//Paused
 	private boolean isPaused = false;
@@ -119,6 +123,9 @@ public class InGameLayer extends BottomLayer {
 	
 	//CircleEffects
 	private List<CircleEffect> circleEffects = new ArrayList<>();
+	
+	//Collectables
+	private List<Collectable> collectables = new ArrayList<>();
 	
 	private EnemyAnalytics analytics = new EnemyAnalytics();
 	
@@ -152,26 +159,7 @@ public class InGameLayer extends BottomLayer {
 	@Override
 	public void onUpdate() {
 		if(isPaused || choosingRules) return;
-		for(Object p : toBeRemoved) 
-		{
-			if(p instanceof Player)
-			{
-				players.remove(p);
-				for(Enemy e: aliveEnemies)
-				{
-					e.getPlayers().remove(p);
-				}
-			}
-			else if(p instanceof RocketMarker)
-			{
-				rocketMarkers.remove(p);
-			}
-			else if(p instanceof CircleEffect)
-			{
-				circleEffects.remove(p);
-			}
-
-		}
+		for(Object p : toBeRemoved) removeObject(p);
 		if(players.size() == 0) {
 			transitionTo(GameOverLayer.class, 0);
 			Game.Get().setFinalScore(score);
@@ -179,6 +167,7 @@ public class InGameLayer extends BottomLayer {
 		toBeRemoved.clear();
 		for(RocketMarker rm : rocketMarkers) rm.update();
 		for(CircleEffect c : circleEffects) c.update();
+		for(Collectable c : collectables) c.update();
 		for(Player p : players) p.update();
 
 		for(int i = 0; i < aliveEnemies.size(); i++)
@@ -199,6 +188,7 @@ public class InGameLayer extends BottomLayer {
 		draw.drawImage(staticLayer, 0, 0, null);
 		for(RocketMarker rm : rocketMarkers) rm.draw(draw);
 		for(CircleEffect c : circleEffects) c.draw(draw);
+		for(Collectable c : collectables) c.draw(draw);
 		for(Player p : players) p.draw(draw);
 		
 		for(int i = 0; i < aliveEnemies.size(); i++)
@@ -230,7 +220,7 @@ public class InGameLayer extends BottomLayer {
 		{
 			if(aliveEnemies.size() == 0)
 			{
-				analytics.printAverageLifeByType();
+				//analytics.printAverageLifeByType();
 				spawnNewWave();
 				waveSpawnCounter = 0;
 			}
@@ -239,7 +229,7 @@ public class InGameLayer extends BottomLayer {
 				waveSpawnCounter++;
 				if(waveSpawnCounter >= waveSpawnTimer)
 				{
-					analytics.printAverageLifeByType();
+					//analytics.printAverageLifeByType();
 					spawnNewWave();
 					waveSpawnCounter = 0;
 				}
@@ -267,6 +257,18 @@ public class InGameLayer extends BottomLayer {
 			iconY = startingY + iconMargin;
 			drawing.drawImage(icon, iconX, iconY, null);
 		}
+	}
+	
+	private void removeObject(Object p)
+	{
+		if(p instanceof Player)
+		{
+			players.remove(p);
+			for(Enemy e: aliveEnemies) e.getPlayers().remove(p);
+		}
+		else if(p instanceof RocketMarker) rocketMarkers.remove(p);
+		else if(p instanceof CircleEffect) circleEffects.remove(p);
+		else if(p instanceof Collectable) collectables.remove(p);
 	}
 	
 	public void drawScoreAndTime(Graphics2D drawing)
@@ -315,7 +317,7 @@ public class InGameLayer extends BottomLayer {
         		allEntities.add(aliveEnemies.get(aliveEnemies.size() - 1));
     			break;
     		case 1:
-    			aliveEnemies.add(new PlantThing(this, spawnpos[1], spawnpos[0], EntityType.PLANTTHING, plantThingMaxHealthPoints, players));
+    			aliveEnemies.add(new PlantThing(this, spawnpos[1], spawnpos[0], EntityType.PLANTTHING, plantThingMaxHealthPoints, players, circleSize));
         		allEntities.add(aliveEnemies.get(aliveEnemies.size() - 1));
     			break;
     		case 2:
@@ -380,8 +382,10 @@ public class InGameLayer extends BottomLayer {
     	{
     	    for (int j = i + 1; j < allEntities.size(); j++)
     	    {
+    	    	
     	    	Entity e1 = allEntities.get(i);
     	    	Entity e2 = allEntities.get(j);
+    	    	
     	    	if(e1.collisionWith(e2)) handleCollision(e1, e2);
     	    }
     	}
@@ -466,6 +470,9 @@ public class InGameLayer extends BottomLayer {
 			case INCREASED_ENEMIES:
 				increaseEnemies(-numberOfEnemiesIncrease);
 				break;
+			case BIGGER_CIRCLE:
+				circleSize -= extraCircleSize;
+				break;
 			}
 		}
 		activeRules.clear();
@@ -513,8 +520,19 @@ public class InGameLayer extends BottomLayer {
     			((Player)e1).loseHP(monsterAttack);
     			analytics.registerDamageDealt(((Enemy) e2).getAnalyticsId(), monsterAttack);
     		}
+    		else if(e1 instanceof Collectable)
+    		{
+    			((Player)e2).collect(((Collectable)e1));
+    			toBeRemoved.add(e1);
+    		}
+    		else if(e2 instanceof Collectable)
+    		{
+    			((Player)e1).collect(((Collectable)e2));
+    			toBeRemoved.add(e2);
+    		}
     	}
     	else {
+    		if(e2 instanceof Collectable || e1 instanceof Collectable) return;
     		if(((Enemy) e2).getSpawning() || ((Enemy) e1).getSpawning())
     		{
     			return;
@@ -620,8 +638,10 @@ public class InGameLayer extends BottomLayer {
 		case INCREASED_ENEMIES:
 			increaseEnemies(numberOfEnemiesIncrease);
 			break;
+		case BIGGER_CIRCLE:
+			circleSize += extraCircleSize;
+			break;
 		}
-		
 	}
 	
 	private void initializeRounds()
@@ -681,6 +701,8 @@ public class InGameLayer extends BottomLayer {
 	public boolean isChoosingRules() { return choosingRules; }
 	public List<RocketMarker> getRocketMarkers() { return rocketMarkers; }
 	public List<CircleEffect> getCircleEffects() { return circleEffects; }
+	public List<Collectable> getCollectables() { return collectables; }
 	public List<Object> getToBeRemoved() { return toBeRemoved; }
+	public List<Entity> getAllEntities() { return allEntities; }
 	public EnemyAnalytics getAnalytics() { return analytics; }
 }

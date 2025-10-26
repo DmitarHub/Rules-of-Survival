@@ -7,8 +7,6 @@ import javax.imageio.ImageIO;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.BufferedReader;
-import game.Game;
-import layers.BottomLayer;
 import layers.ingame.InGameLayer;
 
 public class TileManager {
