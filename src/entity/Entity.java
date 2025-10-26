@@ -31,6 +31,8 @@ public class Entity {
 			break;
 		case COIN:
 			hitbox = new HitBox(EntityType.COIN);
+		case HEART:
+			hitbox = new HitBox(EntityType.HEART);
 		case FROZEN:
 			break;
 		case STRIKING:

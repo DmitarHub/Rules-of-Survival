@@ -520,12 +520,12 @@ public class InGameLayer extends BottomLayer {
     			((Player)e1).loseHP(monsterAttack);
     			analytics.registerDamageDealt(((Enemy) e2).getAnalyticsId(), monsterAttack);
     		}
-    		else if(e1 instanceof Collectable)
+    		else if(e1 instanceof Collectable && !((Collectable)e1).getCollected())
     		{
     			((Player)e2).collect(((Collectable)e1));
     			toBeRemoved.add(e1);
     		}
-    		else if(e2 instanceof Collectable)
+    		else if(e2 instanceof Collectable && !((Collectable)e2).getCollected())
     		{
     			((Player)e1).collect(((Collectable)e2));
     			toBeRemoved.add(e2);

@@ -20,6 +20,7 @@ public class Collectable extends Entity {
 	private int animationTimer;
 	private int animationCounter = 0;
 	private int spriteCounter = 0;
+	private boolean collected = false;
 	
 	public Collectable(int x, int y, EntityType entityType)
 	{
@@ -77,4 +78,7 @@ public class Collectable extends Entity {
 	{
 		draw.drawImage(images.get(spriteCounter), x, y, null);
 	}
+	
+	public void setCollected(boolean b) { collected = b; }
+	public boolean getCollected() { return collected; }
 }

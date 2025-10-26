@@ -82,7 +82,18 @@ public class Enemy extends AliveEntity{
 			int chance = random.nextInt(100);
 			if(chance >= 50)
 			{
-				Collectable c = new Collectable(x, y, EntityType.COIN);
+				int deltaX = random.nextInt(21) - 10;
+				int deltaY = random.nextInt(21) - 10;
+				Collectable c = new Collectable(x + deltaX, y + deltaY, EntityType.COIN);
+				gameLayer.getCollectables().add(c);
+				gameLayer.getAllEntities().add(c);
+			}
+			chance = random.nextInt(100);
+			if(chance < 30)
+			{
+				int deltaX = random.nextInt(21) - 10;
+				int deltaY = random.nextInt(21) - 10;
+				Collectable c = new Collectable(x + deltaX, y + deltaY, EntityType.HEART);
 				gameLayer.getCollectables().add(c);
 				gameLayer.getAllEntities().add(c);
 			}

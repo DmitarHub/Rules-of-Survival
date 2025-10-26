@@ -285,11 +285,13 @@ public class Player extends AliveEntity{
 			coins += 1;
 			break;
 		case HEART:
-			healthPoints = ( healthPoints + 1 ) % maxHealthPoints;
+			if(healthPoints == maxHealthPoints) return;
+			else healthPoints = healthPoints + 1;
 			break;
 		default:
 			break;
 		}
+		c.setCollected(true);
 	}
 
 
