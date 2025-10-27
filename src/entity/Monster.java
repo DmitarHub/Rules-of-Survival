@@ -1,7 +1,7 @@
 package entity;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Random;
 
 import layers.ingame.InGameLayer;
 
@@ -10,14 +10,22 @@ public class Monster extends Enemy {
 	private Player chased;
 	private boolean chasingPlayer = false;
 	private PathFinder pathFinder;
-
-	private final int randomMoveDelay = 60;
+	private final int randomMoveDelay = 150;
 	private int randomMoveCounter = 0;
+	
+	private int pathRecalcDelay = 15;
+	private int pathRecalcCounter = 0;
+	
+	private int pauseDelay = 60;
+	private int pauseCounter = 0;
+	private List<int[]> path = new ArrayList<>();
+	
+	private boolean paused = false;
 
 	public Monster(InGameLayer game, int x, int y, int speed, EntityType entityType, int healthPoints,
 			List<Player> players) {
 		super(game, x, y, speed, entityType, healthPoints, players);
-		this.pathFinder = new PathFinder(game);
+		this.pathFinder = new PathFinder(game, speed);
 	}
 	
 	@Override
@@ -25,32 +33,14 @@ public class Monster extends Enemy {
 	{
 		updateSpawning();
 		updateInvincible();
+		updatePaused();
+		if(paused) return;
 		if(chasingPlayer)
 		{
-			int currentRow = y / gameLayer.getTileSize();
-	        int currentCol = x / gameLayer.getTileSize();
-
-	        int playerRow = chased.getY() / gameLayer.getTileSize();
-	        int playerCol = chased.getX() / gameLayer.getTileSize();
-
-	        List<int[]> path = pathFinder.findPath(currentRow, currentCol, playerRow, playerCol);
-
-	        if (path.size() > 1) {
-	            int[] nextStep = path.get(path.size() - 2);
-
-	            int nextRow = nextStep[0];
-	            int nextCol = nextStep[1];
-
-	            if (nextRow < currentRow) setDirection(Direction.UP);
-	            else if (nextRow > currentRow) setDirection(Direction.DOWN);
-	            else if (nextCol < currentCol) setDirection(Direction.LEFT);
-	            else if (nextCol > currentCol) setDirection(Direction.RIGHT);
-
-	            collisionCheck();
-
-	            move();
+	        if (getDistanceToPlayer(chased) > gameLayer.getTileSize() * 4) {
+	            chasingPlayer = false;
 	        } else {
-	        	chasingPlayer = false;
+	            followPathToPlayer();
 	        }
 		}
 		else {
@@ -71,11 +61,33 @@ public class Monster extends Enemy {
 		animationCounter();
 	}
 	
+	private void followPathToPlayer() {
+	    if (pathRecalcCounter-- <= 0) {
+	        path = pathFinder.findPath(y, x, chased.getY(), chased.getX());
+	        pathRecalcCounter = pathRecalcDelay;
+	    }
+	    if (path.size() > 1) {
+	        int[] next = path.get(path.size() - 2);
+
+            int nextRow = next[0];
+            int nextCol = next[1];
+
+            if (nextRow < y) setDirection(Direction.UP);
+            else if (nextRow > y) setDirection(Direction.DOWN);
+            else if (nextCol < x) setDirection(Direction.LEFT);
+            else if (nextCol > x) setDirection(Direction.RIGHT);
+
+            collisionCheck();
+
+            move();
+	    }
+	}
+	
 	private void randomMove()
 	{
 		if(randomMoveCounter <= 0)
 		{
-			pickRandomDirection();
+			changeToRandomDirection();
 			randomMoveCounter = randomMoveDelay;
 		}
 		else {
@@ -88,22 +100,11 @@ public class Monster extends Enemy {
 
 		if(isCollisionOn())
 		{
-			pickRandomDirection();
+			changeToRandomDirection();
 			randomMoveCounter = randomMoveDelay;
 		}
 	}
 	
-	private void pickRandomDirection()
-	{
-		int i = new Random().nextInt(4);
-		switch(i)
-		{
-		case 0 -> setDirection(Direction.UP);
-		case 1 -> setDirection(Direction.DOWN);
-		case 2 -> setDirection(Direction.LEFT);
-		case 3 -> setDirection(Direction.RIGHT);
-		}
-	}
 
 
 	public void reverseDirection() {
@@ -134,6 +135,20 @@ public class Monster extends Enemy {
 	    } while (newDir == old);
 
 	    this.direction = newDir;
+	}
+	
+	public void pauseForABit()
+	{
+		paused = true;
+	}
+	
+	private void updatePaused()
+	{
+		if(++pauseCounter > pauseDelay)
+		{
+			pauseCounter = 0;
+			paused = false;
+		}
 	}
 
 }

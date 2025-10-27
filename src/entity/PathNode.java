@@ -6,14 +6,14 @@ public class PathNode {
 	private int hCost = 0;
 	private int fCost = 0;
 
-	private int row, column;
+	private int y, x;
 
 	private PathNode parent;
 
 	public PathNode(int row, int column)
 	{
-		this.row = row;
-		this.column = column;
+		this.y = row;
+		this.x = column;
 	}
 
 
@@ -49,12 +49,12 @@ public class PathNode {
 
 	public int getColumn()
 	{
-		return column;
+		return x;
 	}
 
 	public void setColumn(int column)
 	{
-		this.column = column;
+		this.x = column;
 	}
 
 	public PathNode getParent()
@@ -69,12 +69,12 @@ public class PathNode {
 
 	public void setRow(int row)
 	{
-		this.row = row;
+		this.y = row;
 	}
 
 	public int getRow()
 	{
-		return row;
+		return y;
 	}
 
 

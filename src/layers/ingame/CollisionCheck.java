@@ -52,8 +52,10 @@ public class CollisionCheck {
 
 	}
 
-	public boolean checkBlockedTile(int row, int column)
+	public boolean checkBlockedTile(int y, int x)
 	{
+		int row = y / gameLayer.getTileSize();
+		int column = x / gameLayer.getTileSize();
 		int tileNum = gameLayer.getTileManager().getMap()[row][column];
 		if(gameLayer.getTileManager().getTiles()[tileNum].isCollision()) return true;
 

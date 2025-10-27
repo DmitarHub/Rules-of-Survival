@@ -513,11 +513,13 @@ public class InGameLayer extends BottomLayer {
     		if(e1 instanceof Monster && !((Monster) e1).getSpawning() && !((Monster) e1).isDead())
     		{
     			((Player)e2).loseHP(monsterAttack);
+    			((Monster)e1).pauseForABit();
     			analytics.registerDamageDealt(((Enemy) e1).getAnalyticsId(), monsterAttack);
     		}
     		else if(e2 instanceof Monster && !((Monster) e2).getSpawning() && !((Monster) e2).isDead())
     		{
     			((Player)e1).loseHP(monsterAttack);
+    			((Monster)e2).pauseForABit();
     			analytics.registerDamageDealt(((Enemy) e2).getAnalyticsId(), monsterAttack);
     		}
     		else if(e1 instanceof Collectable && !((Collectable)e1).getCollected())
