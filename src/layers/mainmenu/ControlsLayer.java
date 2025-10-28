@@ -148,7 +148,7 @@ public class ControlsLayer extends BottomLayer {
         if (returnHoverBox.contains(e.getPoint())) {
             if (e.getCode() == DifferentEvents.MOVED)
                 returnHovered = true;
-            else if (e.getCode() == DifferentEvents.LEFTCLICK)
+            else if (e.getCode() == DifferentEvents.LEFTCLICKPRESS)
                 transitionTo(MainMenuLayer.class, 0);
         } else if (e.getCode() == DifferentEvents.MOVED)
         	returnHovered = false;

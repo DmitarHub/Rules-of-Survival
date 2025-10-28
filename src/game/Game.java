@@ -45,6 +45,7 @@ public class Game extends JPanel implements Runnable{
     private int framesPerSecond = 0;
     
 	private List<Layer> currentLayers = new CopyOnWriteArrayList<>();
+	// 0 
 	
 	private final String title = "RulesOfSurvival";
 	private Image icon;
@@ -164,10 +165,6 @@ public class Game extends JPanel implements Runnable{
 			System.exit(1);
 		}
 	}
-	
-
-
-	
 	
 	public void update()
     {

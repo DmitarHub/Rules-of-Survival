@@ -44,7 +44,7 @@ public class StatsLayer extends Layer {
 		{
 			mousePosition = e.getPoint();
 		}
-		else if(e.getCode() == DifferentEvents.LEFTCLICK)
+		else if(e.getCode() == DifferentEvents.LEFTCLICKPRESS)
 		{
 			points.add(e.getPoint());
 		}

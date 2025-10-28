@@ -221,7 +221,7 @@ public class GameOverLayer extends BottomLayer {
 			if(mappedHitBoxes.get(mo.getName()).contains(e.getPoint()))
 			{
 				if(e.getCode() == DifferentEvents.MOVED) mappedHovers.replace(mo.getName(), true);
-				else if(e.getCode() == DifferentEvents.LEFTCLICK) 
+				else if(e.getCode() == DifferentEvents.LEFTCLICKPRESS) 
 				{
 					switch(mo)
 					{

@@ -13,7 +13,7 @@ public class KeyInputs implements KeyListener{
 
 	private boolean up, down, left, right;
 	private boolean w, s, a, d;
-	private boolean space, enter;
+	private boolean space, enter, shift;
 
 	private StringBuilder typedBuffer = new StringBuilder();
 	private boolean backspace = false;
@@ -50,7 +50,14 @@ public class KeyInputs implements KeyListener{
 		{
 			for(Layer l : temp)
 			{
-				l.onEvent(new Event(DifferentEvents.TOGGLEPAUSE, e.getKeyCode()));
+				l.onEvent(new Event(DifferentEvents.TOGGLEPAUSE, e.getKeyCode(), 1));
+			}
+		}
+		else if(code == KeyEvent.VK_A && e.isControlDown())
+		{
+			for(Layer l : temp)
+			{
+				l.onEvent(new Event(DifferentEvents.SELECTALL, e.getKeyCode(), 1));
 			}
 		}
 		else
@@ -89,6 +96,9 @@ public class KeyInputs implements KeyListener{
 					break;
 				case KeyEvent.VK_BACK_SPACE:
 					backspace = true;
+					break;
+				case KeyEvent.VK_SHIFT:
+					shift = true;
 					break;
 				default:
 					break;
@@ -136,6 +146,9 @@ public class KeyInputs implements KeyListener{
 			case KeyEvent.VK_BACK_SPACE:
 				backspace = false;
 				break;
+			case KeyEvent.VK_SHIFT:
+				shift = false;
+				break;
 			default:
 				break;
 		}
@@ -165,5 +178,6 @@ public class KeyInputs implements KeyListener{
 	public boolean isD() { return d; }
 	public boolean isSpace() { return space; }
 	public boolean isEnter() { return enter; }
+	public boolean isShift() { return shift; }
 	
 }

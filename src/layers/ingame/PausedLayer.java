@@ -115,7 +115,7 @@ public class PausedLayer extends Layer {
             isPaused = !isPaused;
             return;
         }
-
+        if(e.getType() == 1) return;
         if (!isPaused) return;
 
         for (String option : options) {
@@ -126,7 +126,7 @@ public class PausedLayer extends Layer {
                 mappedHovers.put(option, inside);
             }
 
-            if (e.getCode() == DifferentEvents.LEFTCLICK && inside) {
+            if (e.getCode() == DifferentEvents.LEFTCLICKPRESS && inside) {
                 switch (option) {
                     case "Resume":
                         List<Layer> layers = Game.Get().getCurrentLayers();
