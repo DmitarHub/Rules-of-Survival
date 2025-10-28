@@ -116,7 +116,7 @@ public class MainMenuLayer extends BottomLayer {
 			if(mappedHitBoxes.get(mo.getName()).contains(e.getPoint()))
 			{
 				if(e.getCode() == DifferentEvents.MOVED) mappedHovers.replace(mo.getName(), true);
-				else if(e.getCode() == DifferentEvents.CLICKED) 
+				else if(e.getCode() == DifferentEvents.LEFTCLICK) 
 				{
 					switch(mo)
 					{

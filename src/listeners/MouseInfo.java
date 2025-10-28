@@ -19,10 +19,11 @@ public class MouseInfo extends MouseAdapter{
     @Override
     public void mouseClicked(MouseEvent e) 
     {
+    	
     	List<Layer> temp =  game.getCurrentLayers();
     	for(Layer l: temp)
     	{
-    		l.onEvent(new Event(DifferentEvents.CLICKED, e.getPoint()));
+    		l.onEvent(new Event(e.getButton() == MouseEvent.BUTTON1 ? DifferentEvents.LEFTCLICK : DifferentEvents.RIGHTCLICK, e.getPoint()));
     	}
     }
 

@@ -193,7 +193,7 @@ public class LeaderboardLayer extends BottomLayer {
     public void onEvent(Event e) {
         if (returnHoverBox.contains(e.getPoint())) {
             if (e.getCode() == DifferentEvents.MOVED) returnHovered = true;
-            else if (e.getCode() == DifferentEvents.CLICKED) transitionTo(MainMenuLayer.class, 0);
+            else if (e.getCode() == DifferentEvents.LEFTCLICK) transitionTo(MainMenuLayer.class, 0);
         } else if (e.getCode() == DifferentEvents.MOVED) returnHovered = false;
     }
 

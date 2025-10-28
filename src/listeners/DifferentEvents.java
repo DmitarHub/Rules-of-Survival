@@ -1,7 +1,8 @@
 package listeners;
 
 public enum DifferentEvents {
-	CLICKED,
+	LEFTCLICK,
+	RIGHTCLICK,
 	MOVED,
 	KEYPRESSED,
 	KEYRELEASED,

@@ -126,7 +126,7 @@ public class PausedLayer extends Layer {
                 mappedHovers.put(option, inside);
             }
 
-            if (e.getCode() == DifferentEvents.CLICKED && inside) {
+            if (e.getCode() == DifferentEvents.LEFTCLICK && inside) {
                 switch (option) {
                     case "Resume":
                         List<Layer> layers = Game.Get().getCurrentLayers();
