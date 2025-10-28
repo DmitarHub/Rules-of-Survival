@@ -22,6 +22,7 @@ import layers.ingame.InGameLayer;
 import layers.ingame.PausedLayer;
 import layers.ingame.RuleChoosingLayer;
 import layers.mainmenu.MainMenuLayer;
+import layers.mapmaker.MapMakerLayer;
 import listeners.KeyInputs;
 import tiles.ScaleTool;
 
@@ -172,27 +173,7 @@ public class Game extends JPanel implements Runnable{
     {
 		if(awaitingTransition)
 		{
-			try {
-				currentLayers.set(positionChange, layerClass.getDeclaredConstructor().newInstance());
-				Layer layer0 = currentLayers.get(0);
-				if(layer0 instanceof InGameLayer)
-				{
-					Layer stats = currentLayers.remove(currentLayers.size() - 1);
-					currentLayers.add(new RuleChoosingLayer());
-					currentLayers.add(new PausedLayer());
-					currentLayers.add(stats);
-				}
-				else if(layer0 instanceof GameOverLayer || (layer0 instanceof MainMenuLayer && currentLayers.size() == 4))
-				{
-					Layer stats = currentLayers.remove(currentLayers.size() - 1);
-					currentLayers.remove(currentLayers.size() - 1);
-					currentLayers.remove(currentLayers.size() - 1);
-					currentLayers.add(stats);
-				}
-			} catch (Exception e) {
-				e.printStackTrace();
-			} 
-			awaitingTransition = false;
+			handleTransition();
 		}
 		for(Layer layer : currentLayers) layer.onUpdate();
     }
@@ -210,6 +191,37 @@ public class Game extends JPanel implements Runnable{
 		positionChange = position;
 		awaitingTransition = true;
 		this.layerClass = layerClass;
+	}
+	
+	private void handleTransition()
+	{
+		try {
+			currentLayers.set(positionChange, layerClass.getDeclaredConstructor().newInstance());
+			Layer layer0 = currentLayers.get(0);
+			if(layer0 instanceof InGameLayer)
+			{
+				Layer stats = currentLayers.remove(currentLayers.size() - 1);
+				currentLayers.add(new RuleChoosingLayer());
+				currentLayers.add(new PausedLayer());
+				currentLayers.add(stats);
+			}
+			else if(layer0 instanceof GameOverLayer || (layer0 instanceof MainMenuLayer && currentLayers.size() == 4))
+			{
+				Layer stats = currentLayers.remove(currentLayers.size() - 1);
+				currentLayers.remove(currentLayers.size() - 1);
+				currentLayers.remove(currentLayers.size() - 1);
+				currentLayers.add(stats);
+			}
+			else if(layer0 instanceof MapMakerLayer)
+			{
+				Layer stats = currentLayers.remove(currentLayers.size() - 1);
+				currentLayers.add(new PausedLayer());
+				currentLayers.add(stats);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		} 
+		awaitingTransition = false;
 	}
 
 	public void setNumPlayers(int num) { numberOfPlayers = num; }

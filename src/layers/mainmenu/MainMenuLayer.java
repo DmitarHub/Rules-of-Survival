@@ -14,6 +14,7 @@ import layers.BottomLayer;
 import layers.Layer;
 import layers.ingame.InGameLayer;
 import layers.leaderboard.LeaderboardLayer;
+import layers.mapmaker.MapMakerLayer;
 import listeners.DifferentEvents;
 import listeners.Event;
 
@@ -126,6 +127,9 @@ public class MainMenuLayer extends BottomLayer {
 					case TWO_PLAYERS: 
 						Game.Get().setNumPlayers(2);
 						transitionTo(InGameLayer.class, 0);
+						break;
+					case MAP_MAKER:
+						transitionTo(MapMakerLayer.class, 0);
 						break;
 					case LEADERBOARD: 
 						transitionTo(LeaderboardLayer.class, 0);

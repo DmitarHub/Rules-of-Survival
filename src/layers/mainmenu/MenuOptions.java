@@ -3,6 +3,7 @@ package layers.mainmenu;
 public enum MenuOptions {
 	ONE_PLAYER("ONE PLAYER"),
 	TWO_PLAYERS("TWO PLAYERS"),
+	MAP_MAKER("MAP MAKER"),
 	LEADERBOARD("LEADERBOARD"),
 	CONTROLS("CONTROLS"),
 	EXIT("EXIT");
