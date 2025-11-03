@@ -3,17 +3,25 @@ package layers.mapmaker;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics2D;
 import java.awt.Point;
 import java.awt.Polygon;
+import java.awt.Rectangle;
 import java.awt.Stroke;
 import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.PrintWriter;
+import java.util.LinkedList;
+import java.util.Queue;
 
 import javax.imageio.ImageIO;
 
 import game.Game;
 import layers.BottomLayer;
 import layers.Layer;
+import layers.mainmenu.MainMenuLayer;
 import listeners.DifferentEvents;
 import listeners.Event;
 import listeners.KeyInputs;
@@ -24,6 +32,7 @@ import tiles.TileFileName;
 public class MapMakerLayer extends BottomLayer {
 	
 	private Font optionFont = new Font("SansSerif", Font.PLAIN, 28);
+	private Font msgFont = new Font("SansSerif", Font.BOLD, 50);
 	
 	private final Color backgroundColor = new Color(0xAEECEF);
 	private final Color cantClickColor = new Color(0x1A6970);
@@ -39,7 +48,6 @@ public class MapMakerLayer extends BottomLayer {
 	private final int columnCountAll = 11;
 	private final int rowCountAll = 3;
 	
-	private final int mapWidth = columnCount * tileSize;
 	private final int mapHeight = rowCount * tileSize;
 	
 	private boolean isPaused = false;
@@ -65,8 +73,10 @@ public class MapMakerLayer extends BottomLayer {
 	private int selectedX = 3 * tileSize;
 	private int selectedY = ( rowCount + 1 ) * tileSize;
 	
+	private String emptyTileName = "EmptyTile";
 	private BufferedImage emptyTile;
 	private BufferedImage selectedTile;
+	private String selectedName;
 	private final int selectedTileSize = tileSize * 2;
 	
 	private int lastRow = -1, lastColumn = -1;
@@ -88,17 +98,46 @@ public class MapMakerLayer extends BottomLayer {
 	
 	private int pageOffset = 0;
 	
+	private Rectangle saveButton = new Rectangle(tileSize/2, rowCount * tileSize + tileSize/2, tileSize * 2, tileSize);
+	private Rectangle returnButton = new Rectangle(tileSize/2, (rowCount + 2) * tileSize + tileSize/2, tileSize * 2 , tileSize);
+	
+	private boolean hoveredSaveButton = false;
+	private boolean hoveredReturnButton = false;
+
+	private int newMapIndex = 1;
+	
+	private Queue<String> msgQueue = new LinkedList<>();
+	private boolean destroyLastMessage = false;
+	private int msgCounter = 0;
+	private final int msgTimer = 60;
+	
 	public MapMakerLayer()
 	{
 		ki = Game.Get().getKeyInputs();
 		loadEmptyTiles();
 		loadTiles();
+		File folder = new File("res/maps");
+        File[] files = folder.listFiles();
+        for (int i = 0; i < files.length; i++) {
+        	newMapIndex++;
+        }
 	}
 	
 	@Override
 	public void onUpdate()
 	{
 		if(isPaused) return;
+		if(destroyLastMessage && msgQueue.size() > 1)
+		{
+			msgQueue.poll();
+			destroyLastMessage = false;
+			msgCounter = 0;
+		}
+		if(!msgQueue.isEmpty() && ++msgCounter >= msgTimer) 
+		{
+			msgQueue.poll();
+			msgCounter = 0;
+		}
 	}
 	
 	@Override
@@ -112,7 +151,52 @@ public class MapMakerLayer extends BottomLayer {
 		drawAll(draw, true);
 		drawCurrentSelected(draw);
 		drawTriangles(draw);
+		drawButton(draw, saveButton);
+		drawButton(draw, returnButton);
+		if(!msgQueue.isEmpty()) drawFirstMsg(draw);
 	}
+	
+	private void drawFirstMsg(Graphics2D draw)
+	{
+		Color old = draw.getColor();
+		draw.setColor(Color.red);
+		draw.setFont(msgFont);
+		draw.drawString(msgQueue.peek(), centerString(draw, msgQueue.peek()), height/2);
+		draw.setColor(old);
+	}
+	
+	private void drawButton(Graphics2D draw, Rectangle button)
+	{
+		draw.drawRect(button.x, button.y, button.width, button.height);
+		draw.fillRect(button.x, button.y, button.width, button.height);
+		if((button == saveButton && hoveredSaveButton) || button == returnButton && hoveredReturnButton)
+		{
+			Stroke oldStroke = draw.getStroke();
+			Color oldColor = draw.getColor();
+			draw.setColor(optionChosenColor);
+			draw.setStroke(rectStroke);
+			draw.drawRect(button.x, button.y, button.width, button.height);
+			draw.setStroke(oldStroke);
+			draw.setColor(oldColor);
+		}
+		
+	    draw.setFont(optionFont);
+	    Color old = draw.getColor();
+	    draw.setColor(backgroundColor);
+
+	    String text = (button == saveButton) ? "Save" : "Return";
+
+	    FontMetrics fm = draw.getFontMetrics();
+	    int textWidth = fm.stringWidth(text);
+	    int textHeight = fm.getAscent();
+
+	    int textX = button.x + (button.width - textWidth) / 2;
+	    int textY = button.y + (button.height + textHeight) / 2 - 3; 
+
+	    draw.drawString(text, textX, textY);
+	    draw.setColor(old);
+	}
+	
 	
 	private void drawTriangles(Graphics2D draw)
 	{
@@ -127,7 +211,7 @@ public class MapMakerLayer extends BottomLayer {
 		}
 		else draw.fillPolygon(leftTriangle);
 		draw.drawPolygon(rightTriangle);
-		if(pageOffset * (rowCountAll * columnCountAll) + (rowCountAll * columnCountAll)>= allTiles.length)
+		if(pageOffset * (rowCountAll * columnCountAll) + (rowCountAll * columnCountAll) >= allTiles.length)
 		{
 			Color oldColor = draw.getColor();
 			draw.setColor(cantClickColor);
@@ -189,11 +273,12 @@ public class MapMakerLayer extends BottomLayer {
 			{
 				if(allSelected)
 				{
-					setAllTo(selectedTile);
+					setAllTo(selectedTile, selectedName);
 					allSelected = false;
 					return;
 				}
 				mapTiles[row][column].setImage(selectedTile);
+				mapTiles[row][column].setName(selectedName);
 				shiftX = (int) mousePoint.getX();
 				shiftY = (int) mousePoint.getY();
 				leftClickOn = true;
@@ -202,7 +287,7 @@ public class MapMakerLayer extends BottomLayer {
 			{
 				if(allSelected)
 				{
-					setAllTo(emptyTile);
+					setAllTo(emptyTile, emptyTileName);
 					allSelected = false;
 					return;
 				}
@@ -222,8 +307,16 @@ public class MapMakerLayer extends BottomLayer {
 				if((column != lastColumn || row != lastRow) && lastColumn >= 0 && lastRow >= 0) hoveredTile[lastRow][lastColumn] = false;
 				lastRow = row;
 				lastColumn = column;
-				if(leftClickOn) mapTiles[row][column].setImage(selectedTile);
-				else if(rightClickOn) mapTiles[row][column].setImage(emptyTile);
+				if(leftClickOn) 
+				{
+					mapTiles[row][column].setImage(selectedTile);
+					mapTiles[row][column].setName(selectedName);
+				}
+				else if(rightClickOn) 
+				{
+					mapTiles[row][column].setImage(emptyTile);
+					mapTiles[row][column].setName(emptyTileName);
+				}
 			}
 		}
 		else
@@ -235,12 +328,43 @@ public class MapMakerLayer extends BottomLayer {
 			{
 				checkHoverTriangles(mousePoint);
 				checkHoverAllTiles(mousePoint);
+				checkHoverButtons(mousePoint);
 			}
 			else if(code == DifferentEvents.LEFTCLICKPRESS)
 			{
 				checkTrianglesClick(mousePoint);
 				checkAllTilesClick(mousePoint);
+				checkButtonsClick(mousePoint);
 			}
+		}
+	}
+	
+	private void checkHoverButtons(Point p)
+	{
+		if(saveButton.contains(p))
+		{
+			hoveredSaveButton = true;
+		}
+		else if(returnButton.contains(p))
+		{
+			hoveredReturnButton = true;
+		}
+		else
+		{
+			hoveredSaveButton = false;
+			hoveredReturnButton = false;
+		}
+	}
+	
+	private void checkButtonsClick(Point p)
+	{
+		if(saveButton.contains(p))
+		{
+			addToMaps();
+		}
+		else if(returnButton.contains(p))
+		{
+			transitionTo(MainMenuLayer.class, 0);
 		}
 	}
 	
@@ -293,7 +417,7 @@ public class MapMakerLayer extends BottomLayer {
 		}
 		else if(rightTriangle.contains(p))
 		{
-			if(pageOffset * (rowCountAll * columnCountAll) + (rowCountAll * columnCountAll)>= allTiles.length) return;
+			if(pageOffset * (rowCountAll * columnCountAll) + (rowCountAll * columnCountAll) >= allTiles.length) return;
 			pageOffset++;
 		}
 	}
@@ -303,7 +427,9 @@ public class MapMakerLayer extends BottomLayer {
 		int column = (int)Math.floor((p.getX() - startXAllTiles) / tileSize);
 		int row = (int)Math.floor((p.getY() - startYAllTiles) / tileSize);
 		if(row < 0 || column < 0 || row >= rowCountAll || column >= columnCountAll || pageOffset * (rowCountAll * columnCountAll) + row * columnCountAll + column >= allTiles.length) return; 
-		selectedTile = (BufferedImage)allTiles[pageOffset * (rowCountAll * columnCountAll) + row * columnCountAll + column].getImage();
+		int index = pageOffset * (rowCountAll * columnCountAll) + row * columnCountAll + column;
+		selectedTile = (BufferedImage)allTiles[index].getImage();
+		selectedName = allTiles[index].getName();
 	}
 	
 	private void handleKeyBoardInput(Event e)
@@ -317,10 +443,10 @@ public class MapMakerLayer extends BottomLayer {
 	
 	@Override
 	public <T extends Layer> void transitionTo(Class<T> layerClass, int layerPosition) {
-		
+		Game.Get().queueTransition(layerClass, layerPosition);
 	}
 	
-	private void setAllTo(BufferedImage img)
+	private void setAllTo(BufferedImage img, String name)
 	{
 		
 		for(int i = 0; i < rowCount; i++)
@@ -328,6 +454,7 @@ public class MapMakerLayer extends BottomLayer {
 			for(int j = 0; j < columnCount; j++)
 			{
 				mapTiles[i][j].setImage(img);
+				mapTiles[i][j].setName(name);
 			}
 		}
 	}
@@ -420,6 +547,7 @@ public class MapMakerLayer extends BottomLayer {
             	{
             		mapTiles[i][j] = new Tile();
             		mapTiles[i][j].setImage(u.scaleImage(emptyTile, tileSize, tileSize));
+            		mapTiles[i][j].setName("EmptyTile");
             	}
             }
         } catch (Exception e) {
@@ -446,7 +574,70 @@ public class MapMakerLayer extends BottomLayer {
             e.printStackTrace();
         }
         selectedTile = (BufferedImage)allTiles[0].getImage();
+        selectedName = allTiles[0].getName();
 	}
+	
+	private void addToMaps()
+	{
+		for(int i = 0; i < rowCount; i++)
+		{
+			for(int j = 0; j < columnCount; j++)
+			{
+				if (mapTiles[i][j].getName().equals(emptyTileName))
+				{
+					resetErrorMessage("You need to fill in all of the tiles!");
+					return;
+				}
+			}
+		}
+		
+		File folder = new File("res/maps");
+		File output = new File(folder, "mapa" + newMapIndex++ + ".txt");
+		StringBuilder content = new StringBuilder();
+		try (PrintWriter pw = new PrintWriter(new FileWriter(output)))
+		{
+			for(int i = 0; i < rowCount; i++)
+			{
+				for(int j = 0; j < columnCount; j++)
+				{
+					int tileId = getTileId(mapTiles[i][j]);
+					content.append(tileId);
+					pw.print(tileId);
+					if(j < columnCount - 1) 
+					{
+						pw.print(" ");
+						content.append(" ");
+					}
+				}
+				if(i < rowCount - 1) 
+				{
+					pw.println();
+					content.append('\n');
+				}
+				content.append('\n');
+			}
+		}
+		catch(Exception e)
+		{
+			
+		}
+	}
+	
+	private void resetErrorMessage(String msg)
+	{
+		destroyLastMessage = true;
+		msgQueue.offer(msg);
+	}
+	
+	private int getTileId(Tile t)
+	{
+	    for (int i = 0; i < allTiles.length; i++)
+	        if (allTiles[i].getName().equals(t.getName()))
+	            return i;
+
+	    return -1;
+	}
+	
 	
 	private void togglePaused() { isPaused = !isPaused; }
 }

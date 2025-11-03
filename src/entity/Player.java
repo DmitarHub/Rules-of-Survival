@@ -331,13 +331,13 @@ public class Player extends AliveEntity{
 
 	public void randomTeleport()
 	{
-		this.x = gameLayer.getRandom().nextInt(gameLayer.getRowNumber());
-		this.y = gameLayer.getRandom().nextInt(gameLayer.getColumnNumber());
+		this.x = gameLayer.getRandom().nextInt(gameLayer.getMapRowNumber());
+		this.y = gameLayer.getRandom().nextInt(gameLayer.getMapColumnNumber());
 
-		while(gameLayer.getCollisionMap()[y][x])
+		while(gameLayer.getCollisionMap()[x][y])
 		{
-			x = gameLayer.getRandom().nextInt(gameLayer.getRowNumber());
-			y = gameLayer.getRandom().nextInt(gameLayer.getColumnNumber());
+			x = gameLayer.getRandom().nextInt(gameLayer.getMapRowNumber());
+			y = gameLayer.getRandom().nextInt(gameLayer.getMapColumnNumber());
 
 		}
 

@@ -1,14 +1,25 @@
 package layers.ingame;
 
 import entity.AliveEntity;
+import tiles.TileManager;
 
 public class CollisionCheck {
 
 	private InGameLayer gameLayer;
+	
+	private final int tileSize;
+	private TileManager tm;
+	
+	private final int mapRowNumber;
+	private final int mapColumnNumber;
 
 	public CollisionCheck(InGameLayer game)
 	{
 		this.gameLayer = game;
+		tileSize = gameLayer.getTileSize();
+		tm = gameLayer.getTileManager();
+		mapRowNumber = gameLayer.getMapRowNumber();
+		mapColumnNumber = gameLayer.getColumnNumber();
 	}
 
 	public void checkTile(AliveEntity entity)
@@ -19,17 +30,17 @@ public class CollisionCheck {
 		int bottom = entity.getY() + entity.getHitbox().getOffsetY() + entity.getHitbox().getHitboxHeight();
 
 
-		int leftCol = left/gameLayer.getTileSize();
-		int rightCol = right/gameLayer.getTileSize();
-		int topRow = top/gameLayer.getTileSize();
-		int bottomRow = bottom/gameLayer.getTileSize();
+		int leftCol = left/tileSize;
+		int rightCol = right/tileSize;
+		int topRow = top/tileSize;
+		int bottomRow = bottom/tileSize;
 
 		switch (entity.getDirection())
 		{
-        case UP -> topRow = (top - entity.getSpeed()) / gameLayer.getTileSize();
-        case DOWN -> bottomRow = (bottom + entity.getSpeed()) / gameLayer.getTileSize();
-        case LEFT -> leftCol = (left - entity.getSpeed()) / gameLayer.getTileSize();
-        case RIGHT -> rightCol = (right + entity.getSpeed()) / gameLayer.getTileSize();
+        case UP -> topRow = (top - entity.getSpeed()) / tileSize;
+        case DOWN -> bottomRow = (bottom + entity.getSpeed()) / tileSize;
+        case LEFT -> leftCol = (left - entity.getSpeed()) / tileSize;
+        case RIGHT -> rightCol = (right + entity.getSpeed()) / tileSize;
 		}
 
 	    int[][] tilePositions = switch (entity.getDirection())
@@ -42,8 +53,13 @@ public class CollisionCheck {
 
 		for (int[] pos : tilePositions)
 		{
-            int tileNum = gameLayer.getTileManager().getMap()[pos[1]][pos[0]];
-            if (gameLayer.getTileManager().getTiles()[tileNum].isCollision())
+			if(pos[1] > mapRowNumber || pos[1] < 0 || pos[0] > mapColumnNumber || pos[0] < 0) 
+			{
+				entity.setCollisionOn(true);
+                break;
+			}
+            int tileNum = tm.getMap()[pos[1]][pos[0]];
+            if (tm.getTiles()[tileNum].isCollision())
             {
             	entity.setCollisionOn(true);
                 break;
@@ -54,10 +70,10 @@ public class CollisionCheck {
 
 	public boolean checkBlockedTile(int y, int x)
 	{
-		int row = y / gameLayer.getTileSize();
-		int column = x / gameLayer.getTileSize();
-		int tileNum = gameLayer.getTileManager().getMap()[row][column];
-		if(gameLayer.getTileManager().getTiles()[tileNum].isCollision()) return true;
+		int row = y / tileSize;
+		int column = x / tileSize;
+		int tileNum = tm.getMap()[row][column];
+		if(tm.getTiles()[tileNum].isCollision()) return true;
 
 		return false;
 	}

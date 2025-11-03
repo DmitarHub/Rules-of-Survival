@@ -41,8 +41,13 @@ public class InGameLayer extends BottomLayer {
 	private final int maxRounds = 5;
 	private final int maxWaves = 4;
 	private final Font fontUI = new Font("SansSerif", Font.BOLD, 30);
+	
+	private final Color backgroundColor = new Color(0xAEECEF);
 
 	private final Color slotBackground = new Color(0, 20, 120, 100);
+	
+	private final int mapRowNumber = 14;
+	private final int mapColumnNumber = 18;
 
 	private final int arcWidth = 20;
 	private final int arcHeight = 20;
@@ -52,9 +57,9 @@ public class InGameLayer extends BottomLayer {
 	private final int spaceInBetween = 10;
 	private final int fullSlotWidth = slotWidth * 3 + spaceInBetween * 2;
 	
-	private final int yStart = (int)(tileSize * columnNumber - 3.25 * tileSize);
+	private final int yStart = (int)(tileSize * columnNumber - 3.5 * tileSize);
 	private final int xStart = fullSlotWidth + tileSize;
-	private final int yEnd = (int)(tileSize * columnNumber - 0.25 * tileSize);
+	private final int yEnd = (int)(tileSize * columnNumber - 0.5 * tileSize);
 	private final int xEnd =(int)(tileSize * columnNumber - 0.5 * tileSize);
 	private final int numberOfRules = 3;
 	
@@ -81,7 +86,7 @@ public class InGameLayer extends BottomLayer {
 	//Player stats
 	private List<Player> players = new ArrayList<>();
 	private int playerSpeed = 5;
-	private final int playerSpawnX = tileSize * columnNumber / 2 - tileSize / 2;
+	private final int playerSpawnX = tileSize * columnNumber / 2 - tileSize / 2; // Promeniti
 	private final int playerSpawnY = tileSize * columnNumber / 2 - tileSize / 2;
 	private int playerMaxHealthPoints = 5;
 	private int playerAttack = 2;
@@ -95,7 +100,7 @@ public class InGameLayer extends BottomLayer {
 
 	private List<Enemy> aliveEnemies = new ArrayList<>();
 	private Random random = new Random();
-	private boolean[][] collisionMap = new boolean[columnNumber][rowNumber];
+	private boolean[][] collisionMap = new boolean[mapRowNumber][mapColumnNumber];
 
     private BufferedImage staticLayer;
     private Round[] rounds = new Round[maxRounds];
@@ -148,7 +153,8 @@ public class InGameLayer extends BottomLayer {
 	{
         staticLayer = new BufferedImage(getWidth(), getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D drawing = staticLayer.createGraphics();
-
+        drawing.setColor(backgroundColor);
+        drawing.fillRect(0, 0, width, height);
         getTileManager().draw(drawing);
         drawUI(drawing);
 
@@ -338,13 +344,13 @@ public class InGameLayer extends BottomLayer {
 	
 	private int[] generateRandomSpawnPositions()
     {
-		int x = random.nextInt(columnNumber);
-		int y = random.nextInt(rowNumber);;
+		int x = random.nextInt(mapRowNumber);
+		int y = random.nextInt(mapColumnNumber);;
 
 		while(collisionMap[x][y])
 		{
-			x = random.nextInt(columnNumber);
-			y = random.nextInt(rowNumber);;
+			x = random.nextInt(mapRowNumber);
+			y = random.nextInt(mapColumnNumber);;
 		}
 
 
@@ -489,9 +495,9 @@ public class InGameLayer extends BottomLayer {
 	
 	public void getAllValidSpawnLocations()
     {
-    	for(int i = 0; i < columnNumber; i++)
+    	for(int i = 0; i < mapRowNumber; i++)
     	{
-    		for(int j = 0; j < rowNumber; j++)
+    		for(int j = 0; j < mapColumnNumber; j++)
     		{
     			int tileNum = tileManager.getMap()[i][j];
     			boolean isWalkable = !tileManager.getTiles()[tileNum].isCollision();
@@ -707,4 +713,6 @@ public class InGameLayer extends BottomLayer {
 	public List<Object> getToBeRemoved() { return toBeRemoved; }
 	public List<Entity> getAllEntities() { return allEntities; }
 	public EnemyAnalytics getAnalytics() { return analytics; }
+	public int getMapColumnNumber() { return mapColumnNumber; }
+	public int getMapRowNumber() { return mapRowNumber; }
 }
